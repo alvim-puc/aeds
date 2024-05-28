@@ -9,6 +9,9 @@
 #define DONE (0)
 void menu();
 void clr();
+bool isPrime(int n);
+void draw(int spaces, char symbol);
+void losango(int n, int row);
 
 void ex01() {
   int m[3][3];
@@ -85,16 +88,6 @@ void ex03(){
 
 }
 
-bool isPrime(int n) {
-  if (n <= 1) return false;
-
-  for(int i = 0; i < n; i++){
-    if(n % i == 0) return false;
-  }
-  
-  return true;
-}
-
 void ex04(){
   int * v;
   int tam, primes = 0;
@@ -117,48 +110,58 @@ void ex04(){
   free(v);
 }
 
+void ex05(){
+  int n;
+
+  printf("Digite o tamanho do losangulo: ");
+  scanf("%d", &n);
+  losango((n * 2 - 1), 1);
+
+}
+
 int main(int argc, char ** argv) {
-    int choice;
-    
-    do{
-        menu();
-        scanf("%i%*c", &choice);
-        clr();
-        switch(choice){
-            case 1: 
-                ex01();
-                break;
-            case 2:
-                ex02();
-                break;
-            case 3:
-                ex03();
-                break;
-            case 4:
-            ex04();
-                break;
-            case 5:
-                break;
-            case 6:
-                break;
-            case 7:
-                break;
-            case 8:
-                break;
-            case 9:
-                break;
-            case 10:
-                break;
-            case 0:
-                printf("Gubay 🤙");
-                break;
-            default:
-                printf("opcao invalida");
-                break;
-        }
-    } while(choice != 0);
-    
-    return DONE;
+  int choice;
+  
+  do{
+      menu();
+      scanf("%i%*c", &choice);
+      clr();
+      switch(choice){
+        case 1: 
+          ex01();
+          break;
+        case 2:
+          ex02();
+          break;
+        case 3:
+          ex03();
+          break;
+        case 4:
+          ex04();
+          break;
+        case 5:
+          ex05();
+          break;
+        case 6:
+          break;
+        case 7:
+          break;
+        case 8:
+          break;
+        case 9:
+          break;
+        case 10:
+          break;
+        case 0:
+          printf("Gubay 🤙");
+          break;
+        default:
+          printf("opcao invalida");
+          break;
+      }
+  } while(choice != 0);
+  
+  return DONE;
 }
 
 void menu(){
@@ -167,8 +170,8 @@ void menu(){
     printf("01. Matriz 15\n");
     printf("02. Lista alfabetica\n");
     printf("03. Matriz Dinamica\n");
-    printf("04. Encrypt\n");
-    printf("05. Decrypt\n");
+    printf("04. Primos dinamicos\n");
+    printf("05. Losango\n");
     printf("06. Caracteres\n");
     printf("07. Soma\n");
     printf("08. toUpper\n");
@@ -184,4 +187,41 @@ void clr() {
   #else 
     system("cls");
   #endif
+}
+
+bool isPrime(int n) {
+  if (n <= 1) return false;
+
+  for(int i = 2; i < n; i++){
+    if(n % i == 0) return false;
+  }
+  
+  return true;
+}
+
+void draw(int spaces, char symbol) {
+  if(spaces <= 0) return;
+  else {
+    printf("%c", symbol);
+    draw(spaces - 1, symbol);
+  }
+}
+
+void losango(int n, int row) {
+  if (row <= 0 || row > n) {
+    return;
+  }
+
+  if(row == 1 || row == n){
+    draw(n / 2, ' ');
+    printf("*\n");
+    losango(n, row + 1);
+  }
+
+  else if(row > 1 && row < n){
+    draw(n / 2 + row, ' ');
+    draw(n / 2 + row, '*');
+    printf("*\n");
+    losango(n, row + 1);
+  }
 }
