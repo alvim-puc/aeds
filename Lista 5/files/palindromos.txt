@@ -1,0 +1,5 @@
+ovo é palindromo
+banana não é palindromo
+hannah é palindromo
+anna é palindromo
+jiboia não é palindromo

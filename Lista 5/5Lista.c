@@ -7,10 +7,13 @@
 #include <stdbool.h>
 
 #define DONE (0)
-#define TAMM6 (3)
-#define MAX_CLIENTES (50)
 void menu();
 void clr();
+
+#define TAMM6 (3)
+#define MAX_CLIENTES (50)
+#define SIZE (3)
+
 bool isPrime(int n);
 void draw(int spaces, char symbol);
 void losango(int n, int row);
@@ -19,11 +22,15 @@ typedef struct {
   char nome[30], email[30];
   int cpf, tel;
 } Cliente;
-
+void printTable(int m[4][4], bool revealed[4][4], int l1, int c1, int l2, int c2);
+bool palindromo(char * str, int y, int aux);
+void printBoard(char board[SIZE][SIZE]);
+bool checkWin(char board[SIZE][SIZE], char player);
+void makeMove(char board[SIZE][SIZE], char player);
 
 void ex01() {
   int m[3][3];
-  int soma_diag1 = 0, soma_diag2, soma_lin = 0, soma_col = 0, i, j;
+  int soma_diag1 = 0, soma_diag2 = 0, soma_lin = 0, soma_col = 0, i, j;
 
   for(i = 0; i <3; i++){
     for(j = 0; j <3; j++)
@@ -42,14 +49,12 @@ void ex01() {
     }
 
     if(soma_lin != 15 || soma_col != 15){
-      printf("Matriz diferente de 15\nParando o programa\n");
-      return;
+      printf("Linha/Coluna diferente de 15\n");
     }
   }
 
   if(soma_diag1 != 15 || soma_diag2 != 15) {
-    printf("Diagonal diferente de 15\nParando o programa\n");
-    return;
+    printf("Diagonal diferente de 15\n");
   }
 
   printf("Soma linhas: %d\nSoma colunas: %d\nSoma diagonal I: %d\nSoma diagonal II: %d\n", soma_lin, soma_col, soma_diag1, soma_diag2);
@@ -81,19 +86,20 @@ void ex02() {
 
 void ex03(){
   int ** m;
-  m = (int **) malloc(sizeof(int) * 2);
-  for (int i = 0; i < 2; i++) {
-    m[i] = (int*)malloc(sizeof(int) * 2);
-    for (int j = 0; j < 2; j++) {
+  m = (int **) malloc(sizeof(int) * 6);
+  for (int i = 0; i < 6; i++) {
+    m[i] = (int*)malloc(sizeof(int) * 6);
+    for (int j = 0; j < 6; j++) {
       m[i][j] = (i + 1) + (j + 1);
     }
   }
-  for(int i = 0; i < 2; i++){
-    for(int j = 0; j < 2; j++)
-      printf("%d ", m[i][j]);
-    printf("\n");
+  for(int i = 0; i < 6; i++){
+    for(int j = 0; j < 6; j++)
+      printf("%d\t", m[i][j]);
+    printf("\n\n");
   }
 
+  free(m);
 }
 
 void ex04(){
@@ -159,11 +165,11 @@ void ex07() {
   do {
     printf("\n");
     printf("Loja do seu Souza: \nOpcoes:\n");
-    printf("01. Ver clientes\n");
-    printf("02. Adicionar cliente\n");
-    printf("03. Remover cliente\n");
-    printf("04. Buscar cliente\n");
-    printf("00. sair\n");
+    printf("1. Ver clientes\n");
+    printf("2. Adicionar cliente\n");
+    printf("3. Remover cliente\n");
+    printf("4. Buscar cliente\n");
+    printf("5. sair\n");
     printf("\n");
     scanf("%d%*c", &escolha);
     clr();
@@ -229,16 +235,123 @@ void ex07() {
         }
         if (!found) printf("Cliente não encontrado.\n");
         break;
-      case 0:
+      case 5:
         free(clientes);
         return;
       default:
-        printf("Opção inválida.\n");
+        printf("ops. errado, amigo\n");
         break;
     }
   } while (escolha != 0);
 
   free(clientes);
+}
+
+void ex08(){
+  int i, j, k, temp, l1, c1, l2, c2, matchedPairs = 0;
+  int m[4][4], nums[16];
+  bool revealed[4][4] = {false};
+  bool finish;
+
+  for (i = 0; i < 8; i++) {
+    nums[2 * i] = i + 1;
+    nums[2 * i + 1] = i + 1;
+  }
+
+  srand(time(NULL));
+  for (i = 15; i > 0; i--) {
+    j = rand() % (i + 1);
+    temp = nums[i];
+    nums[i] = nums[j];
+    nums[j] = temp;
+  }
+
+  k = 0;
+  for (i = 0; i < 4; i++) {
+    for (j = 0; j < 4; j++)
+      m[i][j] = nums[k++];
+  }
+
+  finish = false;
+  do {
+    printTable(m, revealed, -1, -1, -1, -1);
+    printf("Escolha linha e coluna das peças que deseja mostrar (ex: 1 3): \n");
+    scanf("%d %d", &l1, &c1);
+    scanf("%d %d", &l2, &c2);
+    clr();
+    
+    if (m[l1-1][c1-1] == m[l2-1][c2-1] && (l1 != l2 || c1 != c2)) {
+      revealed[l1-1][c1-1] = true;
+      revealed[l2-1][c2-1] = true;
+      matchedPairs++;
+      if (matchedPairs == 8) finish = true;
+    } else {
+      printTable(m, revealed, l1-1, c1-1, l2-1, c2-1);
+      printf("Peças diferentes.\n");
+    }
+
+  } while (!finish);
+
+  printf("Parabéns! Você encontrou todos os pares.\n");
+}
+
+void ex09(){
+  char str[100];
+
+  FILE * fin = fopen("./files/strings.txt", "r");
+  if(!fin) return;
+  FILE * fout = fopen("./files/palindromos.txt", "a");
+  if(!fout) return;
+
+  while (!feof(fin))
+  {
+    fgets(str, 100, fin);
+    str[strcspn(str, "\n")] = '\0'; //tira o \n
+    if(palindromo(str, strlen(str) - 1, 0)) 
+      fprintf(fout, "%s é palindromo\n", str);
+    else fprintf(fout, "%s não é palindromo\n", str);
+  }
+
+  fclose(fin);
+  fclose(fout);
+}
+
+void ex10(){
+  char board[SIZE][SIZE] = {
+    {' ', ' ', ' '},
+    {' ', ' ', ' '},
+    {' ', ' ', ' '}
+  };
+
+  int turns = 0;
+  bool gameOver = false;
+
+  while (turns < 5 && !gameOver) {
+    printf("Turn %d:\n", turns + 1);
+
+    makeMove(board, 'x');
+    printBoard(board);
+    if (turns >= 2 && checkWin(board, 'x')) {
+      printf("Jogador x venceu!\n");
+      gameOver = true;
+      break;
+    }
+
+    if (!gameOver && turns < 4) {
+      makeMove(board, 'o');
+      printBoard(board);
+      if (turns >= 2 && checkWin(board, 'o')) {
+        printf("Jogador o venceu!\n");
+        gameOver = true;
+        break;
+      }
+    }
+
+    turns++;
+  }
+
+  if (!gameOver && turns == 5)
+    printf("Velha!!\n");
 }
 
 int main(int argc, char ** argv) {
@@ -271,10 +384,13 @@ int main(int argc, char ** argv) {
           ex07();
           break;
         case 8:
+          ex08();
           break;
         case 9:
+          ex09();
           break;
         case 10:
+          ex10();
           break;
         case 0:
           printf("Gubay 🤙");
@@ -297,10 +413,10 @@ void menu(){
     printf("04. Primos dinamicos\n");
     printf("05. Losango\n");
     printf("06. Matrix File\n");
-    printf("07. Soma\n");
-    printf("08. toUpper\n");
-    printf("09. Caça\n");
-    printf("10. Grupos\n");
+    printf("07. Clientes\n");
+    printf("08. Memory Game\n");
+    printf("09. Palindromos\n");
+    printf("10. Tic-tac-toe\n");
     printf("00. Sair\n");
     printf("\n");
 }
@@ -392,4 +508,61 @@ void matrixSum(int l, int c, int *sum, int m[TAMM6][TAMM6]) {
     *sum += m[l][c];
     matrixSum(l, c + 1, sum, m);
   }
+}
+
+void printTable(int m[4][4], bool revealed[4][4], int l1, int c1, int l2, int c2) {
+  for (int i = 0; i < 4; i++) {
+    for (int j = 0; j < 4; j++) {
+        if (revealed[i][j] || (i == l1 && j == c1) || (i == l2 && j == c2)) {
+            printf("%2d ", m[i][j]);
+        } else {
+            printf(" # ");
+        }
+    }
+    printf("\n");
+  }
+}
+
+bool palindromo(char * str, int y, int aux){
+  if (y <= aux) return true;
+
+  else {
+    if (str[y] != str[aux]) return false;
+    palindromo(str, y-1, aux+1);
+  }
+}
+
+void printBoard(char board[SIZE][SIZE]) {
+    printf("\n");
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            printf(" %c ", board[i][j]);
+            if (j < SIZE - 1) printf("|");
+        }
+        printf("\n");
+        if (i < SIZE - 1) printf("---|---|---\n");
+    }
+    printf("\n");
+}
+
+bool checkWin(char board[SIZE][SIZE], char player) {
+  for (int i = 0; i < SIZE; i++) {
+    if (board[i][0] == player && board[i][1] == player && board[i][2] == player) return true;
+    if (board[0][i] == player && board[1][i] == player && board[2][i] == player) return true;
+  }
+  if (board[0][0] == player && board[1][1] == player && board[2][2] == player) return true;
+  if (board[0][2] == player && board[1][1] == player && board[2][0] == player) return true;
+  return false;
+}
+
+void makeMove(char board[SIZE][SIZE], char player) {
+  int row, col;
+  do {
+    printf("Jogador %c, entre com sua jogada (linha e coluna): ", player);
+    scanf("%d %d", &row, &col);
+    row--;
+    col--;
+  } while (row < 0 || row >= SIZE || col < 0 || col >= SIZE || board[row][col] != ' ');
+
+  board[row][col] = player;
 }
