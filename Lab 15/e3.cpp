@@ -12,18 +12,18 @@ class FormaGeometrica{
   }
 };
 
-class Inhonho : FormaGeometrica{
+class Inhonho : FormaGeometrica{ public:
   float calcularArea() override {
     float r;
 
     cout << "Digite o valor do raio: ";
     cin >> r;
 
-    return 3.14 * pow(r, 2);
+    return 3.14159265359 * pow(r, 2);
   }
 };
 
-class BobEsponja : FormaGeometrica{
+class BobEsponja : FormaGeometrica{ public:
   float calcularArea() override{
     float base, altura;
 
@@ -37,7 +37,7 @@ class BobEsponja : FormaGeometrica{
   }
 };
 
-class BillCipher : FormaGeometrica {
+class BillCipher : FormaGeometrica { public:
   float calcularArea() override {
     float base, altura;
 
@@ -52,8 +52,13 @@ class BillCipher : FormaGeometrica {
 };
 
 int main() {
+  BillCipher triangulo;
+  Inhonho bola;
+  BobEsponja quadrado;
 
-
+  cout << "Area do triangulo: " << triangulo.calcularArea() << endl << endl;
+  cout << "Area do quadrado: " << quadrado.calcularArea() << endl << endl;
+  cout << "Area da bola: " << bola.calcularArea() << endl << endl;
 
   return EXIT_SUCCESS;
 }
