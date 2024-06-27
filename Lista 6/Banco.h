@@ -1,22 +1,29 @@
+#ifndef BANK_H
+#define BANK_H
+
+#include <exception>
 #include <iostream>
+#include <stdexcept>
 #include <string>
+#include <system_error>
 
 using namespace std;
 
 class ContaBancaria {
 private:
   string owner;
-  int balance;
+  double balance;
+  float tax;
 
 public:
 
-  ContaBancaria(string titular, int saldo) : owner(titular), balance(saldo) {}
+  ContaBancaria(string titular, double saldo) : owner(titular), balance(saldo) {}
 
   string getOwner(){
     return owner;
   }
 
-  int getBalance(){
+  double getBalance(){
     return balance;
   }
 
@@ -24,27 +31,65 @@ public:
     owner = value;
   }
 
-  void setBalance(int value){
+  void setBalance(double value){
     balance = value;
   }
 
-  bool verificaValor(double value){
-    return (value < 0 || value > balance) ? false : true;
+  void verificaValor(double value){
+    if(value < 0 || value > balance)
+      throw invalid_argument("Valor invalido");
+  }
+
+  void depositar(double value){
+    try {
+      verificaValor(value);
+      setBalance(value + balance);
+    } catch (::invalid_argument err) {
+      cerr << "Excecao encontrada: " << err.what();
+    }
+
+  }
+
+  virtual void sacar(double value){}
+
+  void transferencia(ContaBancaria c1, ContaBancaria c2, double value){
+    try {
+      verificaValor(value);
+      c1.balance += value;
+      c2.balance -= value;
+    } catch (invalid_argument err) {
+      cerr << "Excecao encontrada: " << err.what();
+    }
+    
   }
 
 };
 
 class ContaPoupanca : ContaBancaria {
-public:
-  //       Conta a receber  | Conta a pagar  
-  void p2p(ContaPoupanca p1, ContaPoupanca p2, double valor){
-    if (!verificaValor(valor)) return;
-    p1.setBalance(p1.getBalance() + valor);
-    p2.setBalance(p2.getBalance() - valor);
-  }
+  void sacar(double value) override{
+    try {
+      verificaValor(value);
+      value = getBalance() - value;
+      setBalance(value - value / 100); // remove a taxa
+    } catch (invalid_argument err) {
+      cerr << "Excecao encontrada: " << err.what();
+    }
 
+  }
 };
 
 class ContaCorrente : ContaBancaria {
 
+  void sacar(double value) override{
+    try {
+      verificaValor(value);
+      setBalance(getBalance() - value);
+    }
+    catch (invalid_argument err) {
+      cerr << "Excecao encontrada: " << err.what();
+    }
+
+  }
 };
+
+#endif

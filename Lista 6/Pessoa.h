@@ -1,3 +1,6 @@
+#ifndef PERSON_H
+#define PERSON_H
+
 #include <cstring>
 #include <iostream>
 #include <string>
@@ -33,3 +36,5 @@ public:
   }
 
 };
+
+#endif

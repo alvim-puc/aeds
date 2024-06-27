@@ -1,3 +1,6 @@
+#ifndef EMPLOYEE_H
+#define EMPLOYEE_H
+
 #include <cstring>
 #include <iostream>
 #include <string>
@@ -23,3 +26,5 @@ public:
 
   
 };
+
+#endif
