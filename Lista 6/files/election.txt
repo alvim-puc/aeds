@@ -1,0 +1,8 @@
+Eleitores:
+Bernardo 18
+Valeria 39
+Marcio 38
+Candidatos:
+Lule 1
+Bonoro 2
+Cirio Gomas 0

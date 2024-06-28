@@ -1,5 +1,5 @@
-#ifndef BANK_H
-#define BANK_H
+#ifndef BANK_HPP
+#define BANK_HPP
 
 #include <exception>
 #include <iostream>
@@ -9,14 +9,14 @@
 
 using namespace std;
 
-class ContaBancaria {
+class ContaBancaria { public:
 private:
   string owner;
   double balance;
   float tax;
 
 public:
-
+  ContaBancaria(){}
   ContaBancaria(string titular, double saldo) : owner(titular), balance(saldo) {}
 
   string getOwner(){
@@ -44,7 +44,7 @@ public:
     try {
       verificaValor(value);
       setBalance(value + balance);
-    } catch (::invalid_argument err) {
+    } catch (invalid_argument err) {
       cerr << "Excecao encontrada: " << err.what();
     }
 
@@ -52,20 +52,26 @@ public:
 
   virtual void sacar(double value){}
 
-  void transferencia(ContaBancaria c1, ContaBancaria c2, double value){
+  void transferencia(ContaBancaria& c1, ContaBancaria& c2, double value) {
     try {
       verificaValor(value);
-      c1.balance += value;
-      c2.balance -= value;
-    } catch (invalid_argument err) {
-      cerr << "Excecao encontrada: " << err.what();
+      c1.setBalance(c1.getBalance() - value);
+      c2.setBalance(c2.getBalance() + value);
+    } catch (invalid_argument& err) {
+      cerr << "Excecao encontrada: " << err.what() << endl;
     }
-    
   }
+
+  ~ContaBancaria(){
+    cout << "Conta bancaria totalmente acabada" << endl;
+  }  
 
 };
 
-class ContaPoupanca : ContaBancaria {
+class ContaPoupanca : public ContaBancaria { public:
+  ContaPoupanca(){}
+  ContaPoupanca(string titular, double saldo) : ContaBancaria(titular, saldo) {}
+
   void sacar(double value) override{
     try {
       verificaValor(value);
@@ -78,7 +84,9 @@ class ContaPoupanca : ContaBancaria {
   }
 };
 
-class ContaCorrente : ContaBancaria {
+class ContaCorrente : public ContaBancaria { public:
+  ContaCorrente(){}
+  ContaCorrente(string titular, double saldo) : ContaBancaria(titular, saldo) {}
 
   void sacar(double value) override{
     try {

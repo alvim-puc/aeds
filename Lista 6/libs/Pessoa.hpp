@@ -1,5 +1,5 @@
-#ifndef PERSON_H
-#define PERSON_H
+#ifndef PERSON_HPP
+#define PERSON_HPP
 
 #include <cstring>
 #include <iostream>
@@ -13,7 +13,8 @@ private:
   string name;
 
 public:
-  Pessoa(int idade, string nome) : age(idade), name(nome) {}
+  Pessoa() : age(0), name("") {}
+  Pessoa(string nome, int idade) : name(nome), age(idade) {}
 
   string getName(){
     return name;
